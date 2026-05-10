@@ -250,8 +250,7 @@ impl Action {
                 signer.sign_dynamic_typed_data_sync(&typed_data)?
             }
             Action::ApproveBuilderFee(inner) => {
-                let typed_data =
-                    get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
+                let typed_data = get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
                 signer.sign_dynamic_typed_data_sync(&typed_data)?
             }
             Action::ConvertToMultiSigUser(inner) => {
@@ -363,8 +362,7 @@ impl Action {
                 signer.sign_dynamic_typed_data(&typed_data).await?
             }
             Action::ApproveBuilderFee(inner) => {
-                let typed_data =
-                    get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
+                let typed_data = get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
                 signer.sign_dynamic_typed_data(&typed_data).await?
             }
             Action::ConvertToMultiSigUser(inner) => {
@@ -472,8 +470,7 @@ impl Action {
                 Ok(typed_data.eip712_signing_hash()?)
             }
             Action::ApproveBuilderFee(inner) => {
-                let typed_data =
-                    get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
+                let typed_data = get_typed_data::<solidity::ApproveBuilderFee>(&inner, chain, None);
                 Ok(typed_data.eip712_signing_hash()?)
             }
             Action::ConvertToMultiSigUser(inner) => {

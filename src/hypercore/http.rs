@@ -57,16 +57,20 @@ use url::Url;
 
 use super::{AssetTarget, signing::*};
 use crate::hypercore::{
-    ActionError, ApiAgent, Builder, CandleInterval, Chain, Cloid, Dex, GossipPriorityAuctionStatus, Market, MultiSigConfig, OidOrCloid, OutcomeMeta, PerpMarket, Signature, SpotMarket, SpotToken, api::{
+    ActionError, ApiAgent, Builder, CandleInterval, Chain, Cloid, Dex, GossipPriorityAuctionStatus,
+    Market, MultiSigConfig, OidOrCloid, OutcomeMeta, PerpMarket, Signature, SpotMarket, SpotToken,
+    api::{
         Action, ActionRequest, ApproveAgent, ApproveBuilderFee, ConvertToMultiSigUser,
         GossipPriorityBid, OkResponse, Response, SignersConfig, UpdateLeverage, VaultTransfer,
-    }, mainnet_url, testnet_url, types::{
+    },
+    mainnet_url, testnet_url,
+    types::{
         AbstractionMode, AgentSendAsset, BasicOrder, BatchCancel, BatchCancelCloid, BatchModify,
         BatchOrder, ClearinghouseState, Fill, FundingRate, InfoRequest, OrderGrouping,
         OrderRequest, OrderResponseStatus, OrderTypePlacement, OrderUpdate, ScheduleCancel,
         SendAsset, SendToken, SpotSend, SubAccount, TimeInForce, UsdSend, UserBalance, UserFees,
         UserRole, UserSetAbstractionAction, UserVaultEquity, VaultDetails,
-    }
+    },
 };
 
 /// HTTP client for HyperCore API.
