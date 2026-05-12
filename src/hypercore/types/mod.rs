@@ -3532,6 +3532,11 @@ pub(super) enum InfoRequest {
     AbstractionMode {
         user: Address,
     },
+    /// Check builder fee approval for a user.
+    CheckBuilderFeeApproval {
+        user: Address,
+        builder: Address,
+    },
 }
 
 #[cfg(test)]
