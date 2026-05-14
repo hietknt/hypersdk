@@ -23,7 +23,7 @@ include = [
 # hypersdk = { path = ".." }
 
 [dependencies]
-hypersdk = { version = "0.2" }
+hypersdk = { path = "..", version = "0.2.11" }
 clap = { version = "4.5", features = ["derive", "env"] }
 tokio = { version = "1.43.1", features = [
     "rt",
