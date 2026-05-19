@@ -199,6 +199,12 @@ impl Dex {
         &self.name
     }
 
+    /// Returns the DEX index.
+    #[must_use]
+    pub fn index(&self) -> usize {
+        self.index
+    }
+
     /// Returns the deployer fee scale for this DEX.
     #[must_use]
     pub fn deployer_fee_scale(&self) -> Option<Decimal> {
@@ -359,6 +365,20 @@ pub enum Subscription {
         #[serde(skip_serializing_if = "Option::is_none")]
         dex: Option<String>,
     },
+    #[display("clearinghouseState({user},{dex:?})")]
+    ClearinghouseState {
+        user: Address,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        dex: Option<String>,
+    },
+    #[display("allDexsClearinghouseState({user})")]
+    AllDexsClearinghouseState { user: Address },
+    #[display("openOrders({user},{dex:?})")]
+    OpenOrders {
+        user: Address,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        dex: Option<String>,
+    },
 }
 
 /// Hyperliquid websocket message.
@@ -460,6 +480,25 @@ pub enum Incoming {
         dex: Option<String>,
         #[serde(flatten)]
         data: serde_json::Value,
+    },
+    /// Clearing house state for a user on a specific dex
+    #[serde(rename_all = "camelCase")]
+    ClearinghouseState {
+        dex: Option<String>,
+        user: Address,
+        clearinghouse_state: ClearinghouseState,
+    },
+    /// Clearing house state for a user on a all dexs
+    #[serde(rename_all = "camelCase")]
+    AllDexsClearinghouseState {
+        user: Address,
+        clearinghouse_states: Vec<(String, ClearinghouseState)>,
+    },
+    /// Open orders for a user on a specific dex
+    OpenOrders {
+        dex: Option<String>,
+        user: Address,
+        orders: Vec<OpenOrder>,
     },
     /// Server heartbeat ping
     Ping,
@@ -1488,6 +1527,19 @@ pub struct WsBasicOrder {
     pub cloid: Option<B128>,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde_as]
+#[serde(rename_all = "camelCase")]
+pub struct OpenOrder {
+    #[serde(flatten)]
+    pub basic_order: BasicOrder,
+    pub trigger_condition: String,
+    pub is_trigger: bool,
+    pub trigger_px: Decimal,
+    pub children: Vec<OpenOrder>,
+    pub is_position_tpsl: bool,
+}
+
 /// Liquidation details.
 ///
 /// Information about a liquidation event associated with a trade or fill.
@@ -2433,7 +2485,7 @@ pub struct ScheduleCancel {
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClearinghouseState {
     /// Margin summary for isolated positions
@@ -2453,7 +2505,7 @@ pub struct ClearinghouseState {
 /// Margin summary for an account.
 ///
 /// Contains aggregate margin information for either isolated or cross-margin positions.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MarginSummary {
     /// Total account value (equity)
@@ -2487,7 +2539,7 @@ impl MarginSummary {
 }
 
 /// Position type for perpetual positions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, derive_more::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, derive_more::Display)]
 #[serde(rename_all = "camelCase")]
 pub enum PositionType {
     /// One-way position mode (single position per market)
@@ -2498,7 +2550,7 @@ pub enum PositionType {
 /// A user's position in a specific asset.
 ///
 /// Wraps the position details along with cumulative funding information.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AssetPosition {
     /// Type of position
@@ -2511,7 +2563,7 @@ pub struct AssetPosition {
 /// Detailed position data for an asset.
 ///
 /// Contains all information about a single perpetual position.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PositionData {
     /// Asset/coin symbol (e.g., "BTC", "ETH")
@@ -2565,7 +2617,7 @@ impl PositionData {
 }
 
 /// Leverage type for positions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, derive_more::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, derive_more::Display)]
 #[serde(rename_all = "camelCase")]
 pub enum LeverageType {
     /// Cross-margin mode (shared margin across positions)
@@ -2577,7 +2629,7 @@ pub enum LeverageType {
 }
 
 /// Leverage configuration for a position.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Leverage {
     /// Leverage type
@@ -2608,7 +2660,7 @@ impl Leverage {
 /// Cumulative funding payments for a position.
 ///
 /// Tracks funding payments over different time periods.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CumulativeFunding {
     /// Total funding payments since position opened
