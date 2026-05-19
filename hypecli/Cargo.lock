@@ -3378,7 +3378,7 @@ dependencies = [
 
 [[package]]
 name = "hypersdk"
-version = "0.2.11"
+version = "0.2.12"
 dependencies = [
  "alloy",
  "anyhow",
