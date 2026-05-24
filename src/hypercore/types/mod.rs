@@ -1510,6 +1510,18 @@ pub struct BasicOrder {
     pub tif: Option<TimeInForce>,
     /// Whether this order should only reduce an existing position.
     pub reduce_only: bool,
+    /// Whether this is a trigger (stop/take-profit) order (`frontendOpenOrders` only).
+    #[serde(default)]
+    pub is_trigger: Option<bool>,
+    /// Trigger price for stop/take-profit orders (`frontendOpenOrders` only).
+    #[serde(default)]
+    pub trigger_px: Option<Decimal>,
+    /// Trigger condition string, e.g. "Price above 10.0" or "N/A" (`frontendOpenOrders` only).
+    #[serde(default)]
+    pub trigger_condition: Option<String>,
+    /// Whether the order is part of a position-level TP/SL bracket (`frontendOpenOrders` only).
+    #[serde(default)]
+    pub is_position_tpsl: Option<bool>,
 }
 
 /// Basic order information for WebSocket updates.
@@ -2098,6 +2110,8 @@ impl AgentSendAsset {
 /// # Variants
 ///
 /// - **Success**: Order was accepted (generic success)
+/// - **WaitingForTrigger**: Trigger order accepted, waiting for its trigger price
+/// - **WaitingForFill**: Order accepted, waiting to be filled
 /// - **Resting**: Order is resting on the book (not immediately filled)
 /// - **Filled**: Order was immediately filled (market or aggressive limit)
 /// - **Error**: Order was rejected with an error message
@@ -2111,6 +2125,12 @@ impl AgentSendAsset {
 /// match status {
 ///     OrderResponseStatus::Success => {
 ///         println!("Order accepted");
+///     }
+///     OrderResponseStatus::WaitingForTrigger => {
+///         println!("Trigger order waiting for trigger price");
+///     }
+///     OrderResponseStatus::WaitingForFill => {
+///         println!("Order waiting to fill");
 ///     }
 ///     OrderResponseStatus::Resting { oid, cloid } => {
 ///         println!("Order {} resting on book", oid);
@@ -2129,6 +2149,10 @@ impl AgentSendAsset {
 pub enum OrderResponseStatus {
     /// Order accepted (generic)
     Success,
+    /// Trigger order accepted, waiting for its trigger price to be reached
+    WaitingForTrigger,
+    /// Order accepted, waiting to be filled
+    WaitingForFill,
     /// Order resting on book
     Resting {
         /// Order ID
