@@ -26,9 +26,16 @@ async fn main() -> anyhow::Result<()> {
     let fees = client.user_fees(args.user).await?;
 
     println!("User: {:?}", args.user);
-    println!("Maker rate: {}", fees.maker_rate);
-    println!("Taker rate: {}", fees.taker_rate);
-    println!("Referral discount: {}", fees.referral_discount);
+    println!("Daily volume: {}", fees.daily_user_vlm);
+    println!("Perp maker rate: {}", fees.user_add_rate);
+    println!("Perp taker rate: {}", fees.user_cross_rate);
+    if let Some(rate) = fees.user_spot_add_rate {
+        println!("Spot maker rate: {}", rate);
+    }
+    if let Some(rate) = fees.user_spot_cross_rate {
+        println!("Spot taker rate: {}", rate);
+    }
+    println!("Referral discount: {}", fees.active_referral_discount);
 
     Ok(())
 }
