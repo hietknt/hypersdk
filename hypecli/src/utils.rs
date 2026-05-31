@@ -85,7 +85,7 @@ pub fn keystore_dir() -> anyhow::Result<PathBuf> {
 }
 
 /// Generates a random secret key for the gossip node.
-pub fn make_key(_signer: &impl Signer) -> SecretKey {
+pub fn make_key(_signer: &(impl Signer + ?Sized)) -> SecretKey {
     // let public_address = signer.address();
     // let mut address_bytes = [0u8; 32];
     // address_bytes[0..20].copy_from_slice(&public_address[..]);
@@ -118,7 +118,7 @@ pub async fn start_gossip(
     key: iroh::SecretKey,
     wait_online: bool,
 ) -> anyhow::Result<(Endpoint, EndpointTicket)> {
-    let endpoint = Endpoint::builder(Empty)
+    let endpoint = Endpoint::builder(Minimal)
         .secret_key(key)
         .relay_mode(iroh::RelayMode::Default)
         .address_lookup(DnsAddressLookup::n0_dns())
