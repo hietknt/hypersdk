@@ -1318,7 +1318,7 @@ pub struct Fill {
     pub fee_token: String,
     /// Builder fee amount, if a builder was used
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub builder_fee: Option<String>,
+    pub builder_fee: Option<Decimal>,
     /// Liquidation details, if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
     pub liquidation: Option<Liquidation>,
@@ -1433,6 +1433,8 @@ pub struct UserLeverage {
     pub leverage_type: String,
     #[serde(deserialize_with = "deserialize_decimal_from_any")]
     pub value: Decimal,
+    #[serde(default)]
+    pub raw_usd: Option<Decimal>,
 }
 
 /// `activeAssetData` feed payload.
@@ -1454,6 +1456,8 @@ pub struct ActiveAssetData {
         deserialize_with = "deserialize_optional_decimal_pair_from_any"
     )]
     pub available_to_trade: Option<[Decimal; 2]>,
+    #[serde(default)]
+    pub mark_px: Option<Decimal>,
 }
 
 impl ActiveAssetData {
@@ -2906,6 +2910,9 @@ pub struct AssetContext {
     /// Impact prices [bid, ask] for funding calculation
     #[serde(default)]
     pub impact_pxs: Option<Vec<String>>,
+    /// 24h base volume (HIP-3 DEXs only)
+    #[serde(with = "rust_decimal::serde::str_option", default)]
+    pub day_base_vlm: Option<Decimal>,
 }
 
 impl AssetContext {
@@ -3087,6 +3094,8 @@ pub struct UserFundingDelta {
     pub usdc: Decimal,
     pub szi: Decimal,
     pub funding_rate: Decimal,
+    #[serde(default)]
+    pub n_samples: Option<u64>,
 }
 
 /// User funding entry.
@@ -3131,9 +3140,9 @@ pub struct DelegatorSummary {
 pub struct DeployAuctionStatus {
     pub start_time_seconds: u64,
     pub duration_seconds: u64,
-    pub start_gas: u64,
-    pub current_gas: u64,
-    pub end_gas: u64,
+    pub start_gas: Decimal,
+    pub current_gas: Decimal,
+    pub end_gas: Option<Decimal>,
 }
 
 /// HIP-3 DEX limits.
@@ -3183,6 +3192,8 @@ pub struct TokenDetails {
     pub seeded_usdc: Option<Decimal>,
     #[serde(default)]
     pub future_emissions: Option<serde_json::Value>,
+    #[serde(default)]
+    pub non_circulating_user_balances: Option<serde_json::Value>,
 }
 
 impl UserBalance {
@@ -3419,22 +3430,18 @@ pub struct VaultDetails {
 /// ```
 ///
 /// <https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/priority-fees>
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GossipPrioritySlot {
     /// Unix timestamp (seconds) when this auction cycle started.
     pub start_time_seconds: u64,
     /// Duration of each Dutch auction cycle in seconds (typically 180).
     pub duration_seconds: u64,
-    /// Price at which the current cycle opened. Denominated in HYPE as a decimal string.
-    pub start_gas: String,
-    /// Current Dutch auction price, or `None` if no bid has landed yet this cycle.
-    /// Denominated in HYPE as a decimal string.
+    pub start_gas: Decimal,
     #[serde(default)]
-    pub current_gas: Option<String>,
-    /// Minimum floor price for this slot's Dutch auction (typically "0.1").
+    pub current_gas: Option<Decimal>,
     #[serde(default)]
-    pub end_gas: Option<String>,
+    pub end_gas: Option<Decimal>,
 }
 
 /// Gossip priority auction status returned by the `/info` endpoint.
@@ -3449,7 +3456,7 @@ pub struct GossipPrioritySlot {
 /// The first inner array contains the **previous cycle's** winning signer addresses
 /// (or `null`) for slots 0–4. The second inner array contains the current Dutch
 /// auction parameters for each slot.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(from = "RawGossipPriorityAuctionStatus")]
 pub struct GossipPriorityAuctionStatus {
     /// Previous-cycle winners' signer addresses (index = slot id), or `None` if
@@ -3508,11 +3515,11 @@ pub enum VaultRelationshipType {
 #[serde(rename_all = "camelCase")]
 pub struct VaultPortfolio {
     /// Historical account values as (timestamp_ms, value) pairs
-    pub account_value_history: Vec<(u64, String)>,
+    pub account_value_history: Vec<(u64, Decimal)>,
     /// Historical PnL values as (timestamp_ms, value) pairs
-    pub pnl_history: Vec<(u64, String)>,
+    pub pnl_history: Vec<(u64, Decimal)>,
     /// Volume for the period
-    pub vlm: String,
+    pub vlm: Decimal,
 }
 
 /// State of a user as a vault follower.

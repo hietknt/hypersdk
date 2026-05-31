@@ -63,7 +63,8 @@ use crate::hypercore::{
     api::{
         Action, ActionRequest, ApproveAgent, ApproveBuilderFee, ConvertToMultiSigUser,
         GossipPriorityBid, Hip3LiquidatorTransferAction, OkResponse, Response, SignersConfig,
-        TokenDelegateAction, TwapOrderParams, UsdClassTransferAction, UpdateLeverage,
+        TokenDelegateAction, TwapOrderParams, UsdClassTransferAction, UpdateIsolatedMargin,
+        UpdateLeverage,
         VaultTransfer, Withdraw3Action,
     },
     mainnet_url, testnet_url,
@@ -467,7 +468,7 @@ impl Client {
     /// Retrieves historical orders for a user.
     ///
     /// Returns all past (non-open) orders, including filled, canceled, and expired orders.
-    pub async fn historical_orders(&self, user: Address) -> Result<Vec<BasicOrder>> {
+    pub async fn historical_orders(&self, user: Address) -> Result<Vec<OrderUpdate<BasicOrder>>> {
         let req = InfoRequest::HistoricalOrders { user };
         self.send_info_request("historical_orders", &req).await
     }
@@ -1748,6 +1749,34 @@ impl Client {
                     asset,
                     is_cross,
                     leverage,
+                }),
+                nonce,
+                vault_address,
+                expires_after,
+            )
+            .await?;
+
+        resp.into_default()
+    }
+
+    /// Updates isolated margin for a position.
+    pub async fn update_isolated_margin<S: SignerSync>(
+        &self,
+        signer: &S,
+        asset: usize,
+        is_buy: bool,
+        ntli: u64,
+        nonce: u64,
+        vault_address: Option<Address>,
+        expires_after: Option<DateTime<Utc>>,
+    ) -> Result<()> {
+        let resp = self
+            .sign_and_send_sync(
+                signer,
+                Action::UpdateIsolatedMargin(UpdateIsolatedMargin {
+                    asset,
+                    is_buy,
+                    ntli,
                 }),
                 nonce,
                 vault_address,
