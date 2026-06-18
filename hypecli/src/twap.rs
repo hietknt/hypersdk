@@ -543,6 +543,7 @@ impl TwapCmd {
                 oid: OidOrCloid::Left(oid),
                 order,
             }],
+            always_place: false,
         };
 
         match client.modify(signer, batch, nonce(), None, None).await {

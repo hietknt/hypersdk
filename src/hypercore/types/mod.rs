@@ -2547,6 +2547,8 @@ pub enum TpSl {
 pub struct BatchModify {
     /// The modifications to apply.
     pub modifies: Vec<Modify>,
+    #[serde(rename = "a")]
+    pub always_place: bool,
 }
 
 /// Modification of an existing order.
@@ -5033,7 +5035,9 @@ mod tests {
                 serde_json::json!({"type": "meta"}),
             );
             assert_json(
-                InfoRequest::Meta { dex: Some("HyperBTC".into()) },
+                InfoRequest::Meta {
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "meta", "dex": "HyperBTC"}),
             );
         }
@@ -5057,11 +5061,17 @@ mod tests {
         #[test]
         fn frontend_open_orders() {
             assert_json(
-                InfoRequest::FrontendOpenOrders { user: USER, dex: None },
+                InfoRequest::FrontendOpenOrders {
+                    user: USER,
+                    dex: None,
+                },
                 serde_json::json!({"type": "frontendOpenOrders", "user": "0x0000000000000000000000000000000000001234"}),
             );
             assert_json(
-                InfoRequest::FrontendOpenOrders { user: USER, dex: Some("HyperBTC".into()) },
+                InfoRequest::FrontendOpenOrders {
+                    user: USER,
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "frontendOpenOrders", "user": "0x0000000000000000000000000000000000001234", "dex": "HyperBTC"}),
             );
         }
@@ -5077,11 +5087,17 @@ mod tests {
         #[test]
         fn user_fills() {
             assert_json(
-                InfoRequest::UserFills { user: USER, aggregate_by_time: None },
+                InfoRequest::UserFills {
+                    user: USER,
+                    aggregate_by_time: None,
+                },
                 serde_json::json!({"type": "userFills", "user": "0x0000000000000000000000000000000000001234"}),
             );
             assert_json(
-                InfoRequest::UserFills { user: USER, aggregate_by_time: Some(true) },
+                InfoRequest::UserFills {
+                    user: USER,
+                    aggregate_by_time: Some(true),
+                },
                 serde_json::json!({"type": "userFills", "user": "0x0000000000000000000000000000000000001234", "aggregateByTime": true}),
             );
         }
@@ -5090,13 +5106,19 @@ mod tests {
         fn user_fills_by_time() {
             assert_json(
                 InfoRequest::UserFillsByTime {
-                    user: USER, start_time: 1000, end_time: None, aggregate_by_time: None,
+                    user: USER,
+                    start_time: 1000,
+                    end_time: None,
+                    aggregate_by_time: None,
                 },
                 serde_json::json!({"type": "userFillsByTime", "user": "0x0000000000000000000000000000000000001234", "startTime": 1000}),
             );
             assert_json(
                 InfoRequest::UserFillsByTime {
-                    user: USER, start_time: 1000, end_time: Some(2000), aggregate_by_time: Some(true),
+                    user: USER,
+                    start_time: 1000,
+                    end_time: Some(2000),
+                    aggregate_by_time: Some(true),
                 },
                 serde_json::json!({"type": "userFillsByTime", "user": "0x0000000000000000000000000000000000001234", "startTime": 1000, "endTime": 2000, "aggregateByTime": true}),
             );
@@ -5105,7 +5127,10 @@ mod tests {
         #[test]
         fn order_status() {
             assert_json(
-                InfoRequest::OrderStatus { user: USER, oid: Either::Left(42) },
+                InfoRequest::OrderStatus {
+                    user: USER,
+                    oid: Either::Left(42),
+                },
                 serde_json::json!({"type": "orderStatus", "user": "0x0000000000000000000000000000000000001234", "oid": 42}),
             );
         }
@@ -5121,11 +5146,17 @@ mod tests {
         #[test]
         fn clearinghouse_state() {
             assert_json(
-                InfoRequest::ClearinghouseState { user: USER, dex: None },
+                InfoRequest::ClearinghouseState {
+                    user: USER,
+                    dex: None,
+                },
                 serde_json::json!({"type": "clearinghouseState", "user": "0x0000000000000000000000000000000000001234"}),
             );
             assert_json(
-                InfoRequest::ClearinghouseState { user: USER, dex: Some("HyperBTC".into()) },
+                InfoRequest::ClearinghouseState {
+                    user: USER,
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "clearinghouseState", "user": "0x0000000000000000000000000000000000001234", "dex": "HyperBTC"}),
             );
         }
@@ -5137,7 +5168,9 @@ mod tests {
                 serde_json::json!({"type": "allMids"}),
             );
             assert_json(
-                InfoRequest::AllMids { dex: Some("HyperBTC".into()) },
+                InfoRequest::AllMids {
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "allMids", "dex": "HyperBTC"}),
             );
         }
@@ -5176,11 +5209,19 @@ mod tests {
         #[test]
         fn funding_history() {
             assert_json(
-                InfoRequest::FundingHistory { coin: "BTC".into(), start_time: 1000, end_time: None },
+                InfoRequest::FundingHistory {
+                    coin: "BTC".into(),
+                    start_time: 1000,
+                    end_time: None,
+                },
                 serde_json::json!({"type": "fundingHistory", "coin": "BTC", "startTime": 1000}),
             );
             assert_json(
-                InfoRequest::FundingHistory { coin: "ETH".into(), start_time: 1000, end_time: Some(2000) },
+                InfoRequest::FundingHistory {
+                    coin: "ETH".into(),
+                    start_time: 1000,
+                    end_time: Some(2000),
+                },
                 serde_json::json!({"type": "fundingHistory", "coin": "ETH", "startTime": 1000, "endTime": 2000}),
             );
         }
@@ -5188,11 +5229,17 @@ mod tests {
         #[test]
         fn vault_details() {
             assert_json(
-                InfoRequest::VaultDetails { vault_address: USER, user: None },
+                InfoRequest::VaultDetails {
+                    vault_address: USER,
+                    user: None,
+                },
                 serde_json::json!({"type": "vaultDetails", "vaultAddress": "0x0000000000000000000000000000000000001234"}),
             );
             assert_json(
-                InfoRequest::VaultDetails { vault_address: USER, user: Some(BUILDER) },
+                InfoRequest::VaultDetails {
+                    vault_address: USER,
+                    user: Some(BUILDER),
+                },
                 serde_json::json!({"type": "vaultDetails", "vaultAddress": "0x0000000000000000000000000000000000001234", "user": "0x0000000000000000000000000000000000005678"}),
             );
         }
@@ -5256,7 +5303,10 @@ mod tests {
         #[test]
         fn max_builder_fee() {
             assert_json(
-                InfoRequest::MaxBuilderFee { user: USER, builder: BUILDER },
+                InfoRequest::MaxBuilderFee {
+                    user: USER,
+                    builder: BUILDER,
+                },
                 serde_json::json!({"type": "maxBuilderFee", "user": "0x0000000000000000000000000000000000001234", "builder": "0x0000000000000000000000000000000000005678"}),
             );
         }
@@ -5268,7 +5318,9 @@ mod tests {
                 serde_json::json!({"type": "metaAndAssetCtxs"}),
             );
             assert_json(
-                InfoRequest::MetaAndAssetCtxs { dex: Some("HyperBTC".into()) },
+                InfoRequest::MetaAndAssetCtxs {
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "metaAndAssetCtxs", "dex": "HyperBTC"}),
             );
         }
@@ -5292,11 +5344,19 @@ mod tests {
         #[test]
         fn user_funding() {
             assert_json(
-                InfoRequest::UserFunding { user: USER, start_time: 1000, end_time: None },
+                InfoRequest::UserFunding {
+                    user: USER,
+                    start_time: 1000,
+                    end_time: None,
+                },
                 serde_json::json!({"type": "userFunding", "user": "0x0000000000000000000000000000000000001234", "startTime": 1000}),
             );
             assert_json(
-                InfoRequest::UserFunding { user: USER, start_time: 1000, end_time: Some(2000) },
+                InfoRequest::UserFunding {
+                    user: USER,
+                    start_time: 1000,
+                    end_time: Some(2000),
+                },
                 serde_json::json!({"type": "userFunding", "user": "0x0000000000000000000000000000000000001234", "startTime": 1000, "endTime": 2000}),
             );
         }
@@ -5304,7 +5364,11 @@ mod tests {
         #[test]
         fn user_non_funding_ledger_updates() {
             assert_json(
-                InfoRequest::UserNonFundingLedgerUpdates { user: USER, start_time: 1000, end_time: None },
+                InfoRequest::UserNonFundingLedgerUpdates {
+                    user: USER,
+                    start_time: 1000,
+                    end_time: None,
+                },
                 serde_json::json!({"type": "userNonFundingLedgerUpdates", "user": "0x0000000000000000000000000000000000001234", "startTime": 1000}),
             );
         }
@@ -5324,7 +5388,9 @@ mod tests {
                 serde_json::json!({"type": "perpsAtOpenInterestCap"}),
             );
             assert_json(
-                InfoRequest::PerpsAtOpenInterestCap { dex: Some("HyperBTC".into()) },
+                InfoRequest::PerpsAtOpenInterestCap {
+                    dex: Some("HyperBTC".into()),
+                },
                 serde_json::json!({"type": "perpsAtOpenInterestCap", "dex": "HyperBTC"}),
             );
         }
@@ -5340,7 +5406,10 @@ mod tests {
         #[test]
         fn active_asset_data() {
             assert_json(
-                InfoRequest::ActiveAssetData { user: USER, coin: "BTC".into() },
+                InfoRequest::ActiveAssetData {
+                    user: USER,
+                    coin: "BTC".into(),
+                },
                 serde_json::json!({"type": "activeAssetData", "user": "0x0000000000000000000000000000000000001234", "coin": "BTC"}),
             );
         }
@@ -5348,7 +5417,9 @@ mod tests {
         #[test]
         fn perp_dex_limits() {
             assert_json(
-                InfoRequest::PerpDexLimits { dex: "HyperBTC".into() },
+                InfoRequest::PerpDexLimits {
+                    dex: "HyperBTC".into(),
+                },
                 serde_json::json!({"type": "perpDexLimits", "dex": "HyperBTC"}),
             );
         }
@@ -5356,7 +5427,9 @@ mod tests {
         #[test]
         fn perp_dex_status() {
             assert_json(
-                InfoRequest::PerpDexStatus { dex: "HyperBTC".into() },
+                InfoRequest::PerpDexStatus {
+                    dex: "HyperBTC".into(),
+                },
                 serde_json::json!({"type": "perpDexStatus", "dex": "HyperBTC"}),
             );
         }
@@ -5412,7 +5485,9 @@ mod tests {
         #[test]
         fn token_details() {
             assert_json(
-                InfoRequest::TokenDetails { token_id: "0xc4bf3f870c0e9465323c0b6ed28096c2".into() },
+                InfoRequest::TokenDetails {
+                    token_id: "0xc4bf3f870c0e9465323c0b6ed28096c2".into(),
+                },
                 serde_json::json!({"type": "tokenDetails", "tokenId": "0xc4bf3f870c0e9465323c0b6ed28096c2"}),
             );
         }
@@ -5524,11 +5599,19 @@ mod tests {
         #[test]
         fn l2_book() {
             assert_json(
-                InfoRequest::L2Book { coin: "BTC".into(), n_sig_figs: None, mantissa: None },
+                InfoRequest::L2Book {
+                    coin: "BTC".into(),
+                    n_sig_figs: None,
+                    mantissa: None,
+                },
                 serde_json::json!({"type": "l2Book", "coin": "BTC"}),
             );
             assert_json(
-                InfoRequest::L2Book { coin: "ETH".into(), n_sig_figs: Some(5), mantissa: Some(2) },
+                InfoRequest::L2Book {
+                    coin: "ETH".into(),
+                    n_sig_figs: Some(5),
+                    mantissa: Some(2),
+                },
                 serde_json::json!({"type": "l2Book", "coin": "ETH", "nSigFigs": 5, "mantissa": 2}),
             );
         }

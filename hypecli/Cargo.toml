@@ -48,7 +48,7 @@ derive_more = { version = "2.1.1", features = ["deref"] }
 rpassword = "7.4.0"
 indicatif = "0.18.3"
 bytes = "1.11.0"
-rust_decimal = { version = "1.39.0", default-features = false, features = ["std"] }
+rust_decimal = { version = "1.42.1", default-features = false, features = ["std"] }
 serde_json = "1"
 strsim = "0.11"
 chrono = "0.4"
