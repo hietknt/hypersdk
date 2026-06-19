@@ -367,8 +367,8 @@ pub enum Subscription {
         /// Opt into Hyperliquid's faster l2Book mode introduced with the websocket push-frequency
         /// migration: `fast: true` pushes 5 levels roughly every 0.5s, while the default feed
         /// remains the deeper, slower 20-level snapshot stream.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        fast: Option<bool>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        fast: bool,
     },
     /// Real-time candlestick updates
     #[display("candle({coin}@{interval})")]
@@ -4271,7 +4271,7 @@ mod tests {
             coin: "BTC".to_string(),
             n_sig_figs: None,
             mantissa: None,
-            fast: None,
+            fast: false,
         };
         assert_eq!(
             serde_json::to_value(&slow).unwrap(),
@@ -4282,7 +4282,7 @@ mod tests {
             coin: "BTC".to_string(),
             n_sig_figs: None,
             mantissa: None,
-            fast: Some(true),
+            fast: true,
         };
         let json = serde_json::to_value(&fast).unwrap();
         assert_eq!(

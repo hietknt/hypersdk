@@ -266,7 +266,7 @@ impl OrderbookCmd {
             coin: resolved.coin.clone(),
             n_sig_figs: None,
             mantissa: None,
-            fast: None,
+            fast: false,
         });
 
         eprintln!("Subscribing to {} orderbook...", self.asset);
