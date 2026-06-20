@@ -20,8 +20,9 @@ include = [
   "Cargo.lock"
 ]
 
-# [patch.crates-io]
-# hypersdk = { path = ".." }
+[patch.crates-io]
+alloy-signer-trezor = { git = "https://github.com/infinitefield/alloy-signer-trezor.git", branch = "main" }
+trezor-client = { git = "https://github.com/infinitefield/trezor-firmware.git", branch = "main", subdirectory = "rust/trezor-client" }
 
 [dependencies]
 hypersdk = { path = "..", version = "0.2.13" }

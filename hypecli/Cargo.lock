@@ -621,16 +621,19 @@ dependencies = [
 
 [[package]]
 name = "alloy-signer-trezor"
-version = "2.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42d749eb0bb9190b511d5abcf3e15ec5806dc12910247e10d8a456e14e08b143"
+version = "1.6.3"
+source = "git+https://github.com/infinitefield/alloy-signer-trezor.git?branch=main#751f0907cf0f864340c8ddcff79651350b719aa3"
 dependencies = [
  "alloy-consensus",
+ "alloy-dyn-abi",
  "alloy-network",
  "alloy-primitives",
  "alloy-signer",
+ "alloy-sol-types",
  "async-trait",
  "semver 1.0.28",
+ "serde",
+ "serde_json",
  "thiserror 2.0.18",
  "tracing",
  "trezor-client",
@@ -7212,14 +7215,14 @@ dependencies = [
 
 [[package]]
 name = "trezor-client"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87873db279766278a7e56b01139943e00a45afc079fc8fa6651e949f2234c3f6"
+version = "0.1.6"
+source = "git+https://github.com/infinitefield/trezor-firmware.git?branch=main#86144786fb521c14be2195550e464007409e0775"
 dependencies = [
  "byteorder",
  "hex",
  "protobuf",
  "rusb",
+ "serde_json",
  "thiserror 2.0.18",
  "tracing",
 ]
