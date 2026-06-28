@@ -36,11 +36,9 @@ pub struct ActionRequest {
     pub nonce: u64,
     /// Signature
     pub signature: Signature,
-    /// Trading on behalf of — omitted from JSON when None (server rejects null)
-    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Trading on behalf of
     pub vault_address: Option<Address>,
-    /// Timestamp in milliseconds — omitted from JSON when None (server rejects null)
-    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Timestamp in milliseconds
     pub expires_after: Option<u64>,
 }
 
