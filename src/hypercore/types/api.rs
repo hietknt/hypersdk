@@ -36,9 +36,11 @@ pub struct ActionRequest {
     pub nonce: u64,
     /// Signature
     pub signature: Signature,
-    /// Trading on behalf of
+    /// Trading on behalf of — omitted from JSON when None (server rejects null)
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub vault_address: Option<Address>,
-    /// Timestamp in milliseconds
+    /// Timestamp in milliseconds — omitted from JSON when None (server rejects null)
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_after: Option<u64>,
 }
 
@@ -85,6 +87,10 @@ pub enum Action {
     SpotSend(SpotSendAction),
     /// EVM user modify.
     EvmUserModify {
+        // rename_all = "camelCase" on the enum applies to variant names but not
+        // struct variant fields when using #[serde(tag = "type")]. Explicit rename
+        // fixes both the JSON body and the msgpack signing hash.
+        #[serde(rename = "usingBigBlocks")]
         using_big_blocks: bool,
     },
     ApproveAgent(ApproveAgent),
