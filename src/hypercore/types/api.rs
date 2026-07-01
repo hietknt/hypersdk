@@ -85,6 +85,10 @@ pub enum Action {
     SpotSend(SpotSendAction),
     /// EVM user modify.
     EvmUserModify {
+        // rename_all = "camelCase" on the enum applies to variant names but not
+        // struct variant fields when using #[serde(tag = "type")]. Explicit rename
+        // fixes both the JSON body and the msgpack signing hash.
+        #[serde(rename = "usingBigBlocks")]
         using_big_blocks: bool,
     },
     ApproveAgent(ApproveAgent),
