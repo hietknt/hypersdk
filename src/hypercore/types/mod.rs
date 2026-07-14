@@ -2547,7 +2547,7 @@ pub enum TpSl {
 pub struct BatchModify {
     /// The modifications to apply.
     pub modifies: Vec<Modify>,
-    #[serde(rename = "a")]
+    #[serde(rename = "a", default, skip_serializing_if = "std::ops::Not::not")]
     pub always_place: bool,
 }
 
