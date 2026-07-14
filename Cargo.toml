@@ -1,7 +1,7 @@
 ## Package metadata
 [package]
 name = "hypersdk"
-version = "0.2.13"
+version = "0.2.14"
 edition = "2024"
 authors = ["Dario <dario@infinitefieldtrading.com>"]
 license = "MPL-2.0"
@@ -64,7 +64,7 @@ name = "list-markets"
 path = "examples/hypercore/list-markets.rs"
 
 [[example]]
-name = "list_tokens"
+name = "list-tokens"
 path = "examples/hypercore/list-tokens.rs"
 
 [[example]]

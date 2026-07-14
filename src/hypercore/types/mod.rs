@@ -364,6 +364,11 @@ pub enum Subscription {
         /// Further aggregation; only valid when `n_sig_figs` is `5` (values: 1, 2, or 5).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         mantissa: Option<u8>,
+        /// Opt into Hyperliquid's faster l2Book mode introduced with the websocket push-frequency
+        /// migration: `fast: true` pushes 5 levels roughly every 0.5s, while the default feed
+        /// remains the deeper, slower 20-level snapshot stream.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        fast: bool,
     },
     /// Real-time candlestick updates
     #[display("candle({coin}@{interval})")]
@@ -2413,6 +2418,10 @@ pub struct BatchOrder {
 pub struct Builder {
     /// Builder address.
     #[serde(rename = "b")]
+    #[serde(
+        serialize_with = "crate::hypercore::utils::serialize_address_as_hex",
+        deserialize_with = "crate::hypercore::utils::deserialize_address_from_hex"
+    )]
     pub builder_address: Address,
     /// Builder fee in tenths of basis points.
     #[serde(rename = "f")]
@@ -3298,7 +3307,7 @@ impl UserBalance {
 ///
 /// This is to prevent users from f*cking it up.
 #[derive(Debug, Clone, Serialize, Deserialize, derive_more::Display)]
-#[display("{}", _0.name)]
+#[display("{}:{}", _0.name, _0.token_id)]
 pub struct SendToken(pub SpotToken);
 
 /// Multi-signature wallet configuration.
@@ -4263,6 +4272,34 @@ mod tests {
     }
 
     #[test]
+    fn test_l2_book_fast_subscription() {
+        let slow = Subscription::L2Book {
+            coin: "BTC".to_string(),
+            n_sig_figs: None,
+            mantissa: None,
+            fast: false,
+        };
+        assert_eq!(
+            serde_json::to_value(&slow).unwrap(),
+            serde_json::json!({ "type": "l2Book", "coin": "BTC" })
+        );
+
+        let fast = Subscription::L2Book {
+            coin: "BTC".to_string(),
+            n_sig_figs: None,
+            mantissa: None,
+            fast: true,
+        };
+        let json = serde_json::to_value(&fast).unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({ "type": "l2Book", "coin": "BTC", "fast": true })
+        );
+        let deserialized: Subscription = serde_json::from_value(json).unwrap();
+        assert_eq!(fast, deserialized);
+    }
+
+    #[test]
     fn test_user_stream_subscription_roundtrip() {
         let user: Address = "0x1234567890abcdef1234567890abcdef12345678"
             .parse()
@@ -5016,9 +5053,10 @@ mod tests {
     }
 
     mod info_request_serialization {
-        use super::*;
         use alloy::primitives::address;
         use either::Either;
+
+        use super::*;
 
         const USER: Address = address!("0x0000000000000000000000000000000000001234");
         const BUILDER: Address = address!("0x0000000000000000000000000000000000005678");
